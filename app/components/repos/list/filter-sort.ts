@@ -2,6 +2,8 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 
+import { sortNumAsc, sortNumDesc } from 'key/utils/github';
+
 import type { LanguageOption } from 'key/components/repos/explorer';
 
 import type { Repo } from 'key/models/custom/repo';
@@ -80,13 +82,6 @@ export default class ReposListFilterSortComponent extends Component<
     return [SortOrder.ASCENDING, SortOrder.DESCENDING];
   }
 
-  get allRepos() {
-    return this.args.allRepos.map((repo, index) => ({
-      index,
-      object: repo,
-    }));
-  }
-
   get isRepoDataIncomplete() {
     return this.args.allRepos.some(
       (repo) => repo.languages === undefined || repo.branches === undefined
@@ -94,11 +89,11 @@ export default class ReposListFilterSortComponent extends Component<
   }
 
   get visibleRepos() {
-    let filteredAndSorted = this.allRepos.filter((repo) => {
+    let filteredAndSorted = this.args.allRepos.filter((repo) => {
       if (this.filter.privacy === Privacy.PUBLIC) {
-        return !repo.object.isPrivate;
+        return !repo.isPrivate;
       } else if (this.filter.privacy === Privacy.PRIVATE) {
-        return repo.object.isPrivate;
+        return repo.isPrivate;
       }
 
       return true;
@@ -107,24 +102,21 @@ export default class ReposListFilterSortComponent extends Component<
     filteredAndSorted = filteredAndSorted.filter((repo) =>
       this.filter.language === 'All'
         ? true
-        : repo.object.languagesArray?.some((l) => l === this.filter.language)
+        : repo.languagesArray?.some((l) => l === this.filter.language)
     );
 
-    // const sortAsc = (a, b) => a - b,
-    //   sortDesc = (a, b) => b - a,
-    //   sort =
+    const isSortOrderAsc = this.sort.sortOrder === SortOrder.ASCENDING,
+      sort = isSortOrderAsc ? sortNumAsc : sortNumDesc;
 
+    if (this.sort.sortProp === 'stargazersCount') {
+      filteredAndSorted.sort((repo1, repo2) => {
+        return sort(repo1.stargazersCount, repo2.stargazersCount);
+      });
+    } else if (this.sort.sortProp === 'index' && !isSortOrderAsc) {
+      filteredAndSorted.reverse();
+    }
 
-    // // Todo sort
-    // filteredAndSorted.sort((repo1, repo2) => {
-    //   if (this.sort.sortProp === 'index') {
-
-    //   } else {
-    //     // stargazer
-    //   }
-    // })
-
-    return filteredAndSorted.map(repo => repo.object);
+    return filteredAndSorted;
   }
 
   @action

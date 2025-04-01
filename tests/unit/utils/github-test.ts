@@ -13,12 +13,16 @@ const LANGUAGES = {
   CSS: 10,
 };
 
-const inputs = [
-  ["/api/repos/${organization}/${repository1}/languages", "ABC"],
-  ["/api/repos/${organization}/${repository1}/branches", "ABC"],
-  ["/api/repos/${organization}/${repository2}/languages", "ABC"],
-  ["/api/repos/${organization}/${repository2}/branches", "ABC"],
+const BRANCHES = [{ id: "main", name: "main" }, { id: "develop", name: "develop" }]
+
+const INPUTS = [
+  "/api/repos/${organization}/${repository1}/languages",
+  "/api/repos/${organization}/${repository1}/branches",
+  "/api/repos/${organization}/${repository2}/languages",
+  "/api/repos/${organization}/${repository2}/branches",
 ];
+
+const token = "ABC";
 
 async function githubFetch(url: string, token: string) {
   return fetch(url, {
@@ -48,8 +52,8 @@ module("Unit | Utility | fetch-data", function (hooks) {
       },
 
       seeds(server) {
-        server.create("branch", { id: "main", name: "main" });
-        server.create("branch", { id: "develop", name: "develop" });
+        server.create("branch", BRANCHES[0]);
+        server.create("branch", BRANCHES[1]);
       },
 
       routes() {
@@ -69,6 +73,10 @@ module("Unit | Utility | fetch-data", function (hooks) {
             return LANGUAGES;
           }
         );
+
+        this.get("*", () => {
+          throw new Error("Simulated network error");
+        });
       },
     });
   });
@@ -79,17 +87,35 @@ module("Unit | Utility | fetch-data", function (hooks) {
 
   test("it fetches languages correctly", async function (assert) {
     const url = "/api/repos/${organization}/${repository}/languages";
-    const result = await githubFetch(url, "ABC");
+    const result = await githubFetch(url, token);
 
     assert.deepEqual(result, LANGUAGES);
   });
 
   test("it fetches branches correctly", async function (assert) {
     const url = "/api/repos/${organization}/${repository}/branches";
-    const result = await githubFetch(url, "ABC");
+    const result = await githubFetch(url, token);
     const branches = result.map((b:Branch)  => b.name);
 
     assert.deepEqual(branches, ['main', 'develop']);
+  });
+
+  test("it fetches branches and languages correctly with promiseSequence", async function (assert) {
+    const result = await promiseSequence(INPUTS.map((url) => [url, token]), (url: string, token: string) => githubFetch(url, token)),
+    expected = [LANGUAGES, BRANCHES, LANGUAGES, BRANCHES];
+    assert.deepEqual(result, expected);
+  });
+
+  test("it handles failed requests correctly in promiseSequence", async function (assert) {
+    const result = await promiseSequence(INPUTS.map((url) => [url + 'broken', token]), (url: string, token: string) => githubFetch(url, token)),
+    expected = [null, null, null, null];
+    assert.deepEqual(result, expected);
+  });
+
+  test("it handles a mix of successfull and failed requests in promiseSequence", async function (assert) {
+    const result = await promiseSequence(INPUTS.map((url) => [url + (url.includes('repository1') ? '' : 'broken'), token]), (url: string, token: string) => githubFetch(url, token)),
+    expected = [LANGUAGES, BRANCHES, null, null];
+    assert.deepEqual(result, expected);
   });
 });
 /* eslint-enable */

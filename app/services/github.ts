@@ -68,6 +68,10 @@ export default class GithubService extends Service {
     organizationName: string,
     requestedBy: string
   ) {
+    if (!newRepoObjects || !newRepoObjects.length) {
+      return;
+    }
+
     const oldRepos = this.repos,
       idMap = new Map(oldRepos.map((repo, index) => [repo.id, index])),
       repos = [...oldRepos],
@@ -99,7 +103,7 @@ export default class GithubService extends Service {
         (url: string, token: string) => this.fetch(url, token)
       )
         .then((result) => {
-          result.results.forEach((data, index) => {
+          result.forEach((data, index) => {
             const repoIndex = Math.floor(index / 2);
             const repoName = batch[repoIndex]?.repoName;
             const repo = repos.find((r) => r.name === repoName);
