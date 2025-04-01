@@ -1,0 +1,8 @@
+<ul>
+  {{#each this.languagePercentages as |lang|}}
+    <li class='flex justify-between mb-2'>
+      <span>{{lang.language}}</span>
+      <span>{{lang.percentage}}%</span>
+    </li>
+  {{/each}}
+</ul>

@@ -1,0 +1,46 @@
+<div class='w-full flex flex-col'>
+  <h2 class='text-base/7 font-semibold text-gray-900'>{{@heading}}</h2>
+  <p class='mt-1 text-sm/6 text-gray-600'>
+    {{@info}}
+    You can generate it at
+    <a
+      href='https://github.com/settings/tokens'
+      target='_blank'
+      rel='noopener noreferrer'
+      class='text-sky-600'
+    >https://github.com/settings/tokens</a>. Choose the "repo" scope.
+  </p>
+</div>
+{{#if @showCtaInstead}}
+  <div class='flex'>
+    <LinkTo
+      class='text-white bg-sky-700 rounded-md px-3 py-2 text-md mt-4 w-auto font-medium'
+      @route={{this.linkTo}}
+    >
+      Set it up
+    </LinkTo>
+  </div>
+{{else}}
+  <form {{on 'submit' this.addToken}} class={{this.maxInputWidth}}>
+    <div class='relative mt-7 flex w-full flex-wrap items-stretch'>
+      <Common::Input
+        @id='token'
+        @name='token'
+        @placeholder='Personal Access Token'
+        @inputClasses='rounded-r-none'
+        @containerClasses='flex-grow !w-auto'
+        @onValueChange={{this.handleTokenChange}}
+      />
+      <button
+        class='z-[2] inline-block rounded-e px-6 pb-[6px] pt-2 border-2 border-transparent leading-normal bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-sky-500'
+        type='submit'
+        disabled={{this.isLoading}}
+      >
+        {{#if this.isLoading}}Loading...{{else}}Add{{/if}}
+      </button>
+    </div>
+    {{#if this.errorMessage}}
+      <p class='mt-2 text-sm text-red-500'>{{this.errorMessage}}</p>
+    {{/if}}
+  </form>
+{{/if}}

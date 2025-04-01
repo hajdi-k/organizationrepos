@@ -1,0 +1,11 @@
+<div class={{this.containerClasses}}>
+  <input
+    type={{this.type}}
+    name={{this.name}}
+    id={{this.id}}
+    placeholder={{this.placeholder}}
+    value={{this.value}}
+    {{on 'input' this.handleChange}}
+    class={{this.inputClasses}}
+  />
+</div>

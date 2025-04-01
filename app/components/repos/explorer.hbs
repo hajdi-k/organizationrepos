@@ -1,0 +1,42 @@
+<div class='m-6 rounded-2xl bg-sky-600 text-white py-16 px-4 sm:px-6 lg:px-8'>
+  <div class='max-w-7xl mx-auto text-center'>
+    <h1 class='text-4xl font-bold sm:text-5xl lg:text-6xl'>
+      Explore Github Organizations
+    </h1>
+    <p class='mt-4 text-xl sm:text-2xl'>
+      Search for organizations and dive into their repositories.
+    </p>
+    <div class='mt-8 max-w-md mx-auto'>
+      <Repos::Search
+        @onOrganizationNameChange={{this.handleOrganizationNameChange}}
+        @onTokenChange={{this.handleTokenChange}}
+      />
+    </div>
+  </div>
+</div>
+
+{{#if this.organizationName}}
+  <div class={{this.uiHelperService.MODULE_STYLES}}>
+    {{#if this.isLoading}}
+      <p>Loading...</p>
+    {{else if this.errorMessage}}
+      <p class='error text-red-600'>{{this.errorMessage}}</p>
+    {{else if this.isAuthenticated}}
+      <div>
+        <Repos::List::FilterSort @allRepos={{this.allRepos}} as |visibleRepos|>
+          {{#if visibleRepos.length}}
+            <Repos::List @repos={{visibleRepos}} />
+          {{else}}
+            No results found...
+          {{/if}}
+        </Repos::List::FilterSort>
+      </div>
+    {{else}}
+      <Tokens::Add
+        @heading='Small detail before we start searching...'
+        @info='You need a personal GitHub access token.'
+        @showCtaInstead={{true}}
+      />
+    {{/if}}
+  </div>
+{{/if}}

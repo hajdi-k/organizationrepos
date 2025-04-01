@@ -1,0 +1,53 @@
+<nav class='bg-white'>
+  <div class='mx-auto max-w-7xl px-2 lg:px-8'>
+    <div class='flex h-16 items-center justify-between'>
+      <div class='flex'>
+        <div class='flex shrink-0 items-center'>
+          <div
+            class='h-8 w-auto [&>svg]:w-auto [&>svg]:h-full [&>svg]:fill-sky-700'
+          >
+            <Icons::Logo />
+          </div>
+        </div>
+        <div class='sm:ml-7'>
+          <div class='flex space-x-4'>
+            {{#each this.navigationLinks as |link|}}
+              <LinkTo
+                class='rounded-md px-3 py-2 text-sm font-medium
+                  {{link.classes}}'
+                @route={{link.route}}
+              >
+                {{link.name}}
+              </LinkTo>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+
+      <div class='flex items-center pr-2'>
+        {{#if this.isAuthenticated}}
+          <button
+            type='button'
+            {{on 'click' this.revokeTokens}}
+            class={{this.tokenButtonClasses}}
+          >
+            {{this.revokeTokensText}}
+            <Icons::Logout />
+          </button>
+        {{else}}
+          {{#unless this.isRouteAddToken}}
+            <button
+              type='button'
+              {{on 'click' this.addToken}}
+              class={{this.tokenButtonClasses}}
+            >
+              Add a token
+              <Icons::Login />
+            </button>
+          {{/unless}}
+        {{/if}}
+      </div>
+
+    </div>
+  </div>
+</nav>

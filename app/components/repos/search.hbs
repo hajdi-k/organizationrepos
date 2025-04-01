@@ -1,0 +1,27 @@
+<div
+  class='bg-red flex items-center rounded-md bg-white outline-2 outline-sky-600 focus-within:outline-gray-100'
+>
+  <Common::Input
+    @id='organization-name'
+    @name='organization-name'
+    @placeholder='Enter organization name'
+    @onValueChange={{this.handleOrganizationNameChange}}
+    @inputClasses='border-transparent focus:border-transparent !py-2 outline-none !rounded-e-none'
+    @containerClasses='min-w-0'
+  />
+  <div class='grid shrink-0 grid-cols-1 focus-within:relative h-full max-w-40'>
+    <select
+      {{on 'change' this.handleTokenChange}}
+      class='h-[44px] col-start-1 row-start-1 w-full outline-2 outline-transparent appearance-none rounded-md py-1.5 pr-7 pl-4 text-base text-gray-500 placeholder:text-gray-400 focus:outline-2 focus:outline-gray-200 sm:text-sm/6'
+    >
+      {{#each this.tokens as |token|}}
+        <option
+          value={{token.id}}
+          selected={{if (this.isSelectedToken token.id) 'selected'}}
+        >{{token.user.login}}</option>
+      {{/each}}
+    </select>
+
+    <Icons::Arrow />
+  </div>
+</div>

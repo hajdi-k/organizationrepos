@@ -1,0 +1,61 @@
+<div class="mb-4">
+  <h2 class="text-base/7 font-semibold text-gray-900 mb-2">Filter by privacy</h2>
+  <div
+    class="inline-flex space-x-0 bg-white border border-sky-500 rounded-lg shadow-md mb-4"
+  >
+    {{#each this.privacyOptions as |option|}}
+      <button
+        type="button"
+        {{on "click" (fn this.changePrivacyFilter option.value)}}
+        class="{{this.classForPrivateFilter}} {{option.activeClass}}"
+      >{{option.value}}</button>
+    {{/each}}
+  </div>
+
+  {{#if this.showLanguageOptions}}
+    <h2 class="text-base/7 font-semibold text-gray-900 mb-4">or language used</h2>
+    <div
+      class="flex space-x-2 items-center justify-left w-full flex-wrap gap-y-2 mb-4"
+    >
+      {{#each this.languageOptions as |option|}}
+        <button
+          type="button"
+          {{on "click" (fn this.changeLanguageFilter option.value)}}
+          class="{{option.activeClass}}
+            inline-flex items-center justify-between space-x-1 bg-sky-100 text-sky-800 px-2 py-0.5 rounded-md text-sm"
+        >
+          {{option.value}}
+        </button>
+      {{/each}}
+    </div>
+  {{/if}}
+
+  <h2 class="text-base/7 font-semibold text-gray-900 mb-2">Sort by:</h2>
+  <div
+    class="mb-4"
+  >
+
+    <select
+      {{on "change" this.handleSortOptionChange}}
+      class="h-[44px] col-start-1 row-start-1 w-full outline-2 outline-transparent appearance-none rounded-md py-1.5 pr-7 pl-4 text-base text-gray-500 placeholder:text-gray-400 focus:outline-2 focus:outline-gray-200 sm:text-sm/6"
+    >
+      {{#each this.sortOptions as |sortOption|}}
+        <option
+          value={{sortOption.id}}
+          selected={{if (this.isSelectedSortOption sortOption.id) "selected"}}
+        >{{sortOption.name}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  {{#if this.isRepoDataIncomplete}}
+    <p class="text-gray-600 flex gap-2 mb-6">Loading additonal repo details
+      <div role="status">
+        <Icons::Spinner />
+        <span class="sr-only">Loading...</span>
+      </div>
+    </p>
+  {{/if}}
+
+  {{yield this.visibleRepos}}
+</div>
